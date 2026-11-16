@@ -7,6 +7,7 @@ import torch
 from torch import nn
 
 from torchline.export import save_model
+from torchline.lookup_table import generate
 
 MODELS_DIR = Path(__file__).resolve().parents[2] / "models"  # torchline/python/models
 
@@ -69,3 +70,5 @@ def run() -> None:
         predictions = model(torch.tensor([[0.5, 0.3]]))
 
     print(predictions)
+
+    generate(model)

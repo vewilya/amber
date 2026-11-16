@@ -10,6 +10,7 @@
 #include <dsp/audio_component.h>
 #include <dsp/plugin_handler.h>
 #include <dsp/one_pole.h>
+#include <dsp/amber.h>
 
 #define SAMPLE_RATE 48000.0
 #define FRAMES_PER_BUFFER 1024
@@ -62,7 +63,7 @@ int main(/* int argc, const char *argv[]*/)
 
     // registerPluginToChain(&gain);
     // Plugin *op = one_pole_create(48000.0, 2, 0.9f);
-    Plugin *amber = amber_create(48000.0, 2, 3.0);
+    Plugin *amber = amber_create(48000.0, 2, 1.0);
 
     // register_plugin_to_chain((Plugin *)op);
     register_plugin_to_chain((Plugin *)amber);
