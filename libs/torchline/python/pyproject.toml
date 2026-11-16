@@ -3,6 +3,7 @@ name = "torchline"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
+license = "MIT"
 authors = [
     { name = "vewilya", email = "77921468+vewilya@users.noreply.github.com" }
 ]

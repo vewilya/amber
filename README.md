@@ -1,6 +1,6 @@
 # Amber
 
-A real-time audio saturation effect driven by a tiny neural network. A simple proof of concept with a python-torch driven training part and the inference being done in C.
+A real-time audio saturation effect driven by a tiny neural network. A simple proof of concept with a python-torch driven training part and the inference being done in C. 
 
 A small MLP is trained in PyTorch to mimic an **asymmetric soft-saturation curve**
 (`tanh` on the positive half, `sin` on the negative half). Its weights are exported to a C header and run sample-by-sample inside a plain C audio pipeline built on PortAudio.
@@ -14,11 +14,11 @@ A small MLP is trained in PyTorch to mimic an **asymmetric soft-saturation curve
 **DSP & model**
 
 - Gain staging: drive is applied both in training and at runtime, and output peaks at about −9.5 dBFS.
-- Only dense layers so far; RNN and convolution layers (with per-channel state) are needed for effects with memory.
+- Only dense layers so far; RNN and convolution layers are needed for effects with memory.
 - Weights are compiled in, so only one model per build and no loading at runtime.
 - No oversampling yet, so the saturation aliases.
 - No DC blocker after the asymmetric curve.
-- The 2→16→2 model mixes left and right; a per-channel 1→N→1 model would be cleaner.
+- The 2→16→2 model mixes left and right; a per-channel. Depending on what is modeled a 1→N→1 model would be cleaner.
 - No parameter smoothing, so drive changes will cause zipper noise.
 
 **Real-time**
