@@ -1,0 +1,24 @@
+[
+  {
+    "label": "Test current file",
+    "command": "mkdir -p \"$ZED_WORKTREE_ROOT/build\" && clang -DRUN_TESTS -Wall -Wextra -Wno-unused-function -g -fsanitize=address,undefined -x c \"$ZED_FILE\" -I\"$ZED_DIRNAME\" -I\"$ZED_WORKTREE_ROOT/libs/dsp/include\" -I$(brew --prefix)/include -L$(brew --prefix)/lib -lcriterion -o \"$ZED_WORKTREE_ROOT/build/${ZED_STEM}_test\" && \"$ZED_WORKTREE_ROOT/build/${ZED_STEM}_test\" --verbose",
+  },
+  {
+    "label": "Run main in current file",
+    "command": "mkdir -p \"$ZED_WORKTREE_ROOT/build\" && clang -DRUN_MAIN -std=c23 -Wall -Wextra -Wno-unused-function -g -fsanitize=address,undefined -x c \"$ZED_FILE\" -I\"$ZED_DIRNAME\" -I\"$ZED_WORKTREE_ROOT/libs/dsp/include\" -I\"$ZED_WORKTREE_ROOT/libs/torchline/include\" -lm -o \"$ZED_WORKTREE_ROOT/build/${ZED_STEM}_main\" && \"$ZED_WORKTREE_ROOT/build/${ZED_STEM}_main\"",
+  },
+  {
+    "label": "Show assembly",
+    "command": "mkdir -p \"$ZED_WORKTREE_ROOT/build\" && clang -S -O2 -fno-asynchronous-unwind-tables -x c \"$ZED_FILE\" -I\"$ZED_WORKTREE_ROOT/libs/dsp/include\" -I$(brew --prefix)/include -o \"$ZED_WORKTREE_ROOT/build/$ZED_STEM.s\" && zed \"$ZED_WORKTREE_ROOT/build/$ZED_STEM.s\"",
+  },
+  {
+    "label": "Torchline: Train",
+    "command": "uv run torchline train",
+    "cwd": "$ZED_WORKTREE_ROOT/libs/torchline/python",
+  },
+  {
+    "label": "Run Plugin",
+    "command": "sh run.sh",
+    "cwd": "$ZED_WORKTREE_ROOT/",
+  },
+]
