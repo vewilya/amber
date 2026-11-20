@@ -1,0 +1,10 @@
+[
+  {
+    "label": "Debug plugin",
+    "adapter": "CodeLLDB",
+    "request": "launch",
+    "build": "dev: build",
+    "program": "$ZED_WORKTREE_ROOT/build/dev/amber",
+    "cwd": "$ZED_WORKTREE_ROOT"
+  }
+]

@@ -1,5 +1,7 @@
 # Amber
 
+[![CI](https://github.com/vewilya/amber/actions/workflows/ci.yml/badge.svg)](https://github.com/vewilya/amber/actions/workflows/ci.yml)
+
 A real-time audio saturation effect driven by a tiny neural network. A simple proof of concept with a python-torch driven training part and the inference being done in C.
 
 A small MLP is trained in PyTorch to mimic an **asymmetric soft-saturation curve**
@@ -39,7 +41,9 @@ A small MLP is trained in PyTorch to mimic an **asymmetric soft-saturation curve
 .
 ├── main.c                  # PortAudio host: device selection, stream, effect on/off
 ├── CMakeLists.txt
-├── run.sh                  # configure, build and run
+├── CMakePresets.json       # dev / release / coverage / ci
+├── cmake/                  # compiler options, format/docs/coverage targets
+├── run.sh                  # build (dev preset) and run
 └── libs/
     ├── dsp/                # plugin interface, plugin chain, effects, Q15 math
     │   ├── include/dsp/
@@ -50,13 +54,15 @@ A small MLP is trained in PyTorch to mimic an **asymmetric soft-saturation curve
     │   │   ├── q15.h             # fixed-point helpers
     │   │   └── inline_test.h     # TEST() macros for tests living next to code
     │   ├── src/
-    │   └── tests/
+    │   ├── tests/
+    │   └── benchmarks/     # Google Benchmark (C++)
     └── torchline/          # minimal feed-forward inference engine in C
         ├── include/torchline/torchline.h
         ├── src/
         │   ├── engine.c
         │   └── model_weights.h   # generated — do not edit by hand
         ├── tests/
+        ├── benchmarks/
         └── python/         # training + export (uv project)
             ├── src/torchline/
             └── models/     # .pt / .safetensors / .json snapshots
@@ -65,28 +71,37 @@ A small MLP is trained in PyTorch to mimic an **asymmetric soft-saturation curve
 ## Requirements
 
 - macOS (Homebrew) or another Unix with a C23-capable compiler (recent Clang/GCC)
-- CMake ≥ 3.21
+- CMake ≥ 3.25
 - [PortAudio](https://www.portaudio.com/) (found via `pkg-config` as `portaudio-2.0`)
 - [Criterion](https://github.com/Snaipe/Criterion) for unit tests
+- [Google Benchmark](https://github.com/google/benchmark) (C++) for benchmarks
+- clang-format, clang-tidy (from `llvm`) and Doxygen for the developer targets
 - [uv](https://docs.astral.sh/uv/) and Python ≥ 3.15 for training (optional)
 
 ```sh
-brew install cmake pkg-config portaudio criterion uv
+# macOS
+brew install cmake pkg-config portaudio criterion google-benchmark llvm clang-format doxygen uv
+# Ubuntu: see .github/workflows/ci.yml
+
+# Optional, for clangd: point it at the dev build's compile database
+ln -s build/dev/compile_commands.json compile_commands.json
 ```
 
-## Build & run
+## Commands
 
-```sh
-./run.sh
-```
+| Task | Command |
+|---|---|
+| Build and test (debug, sanitizers) | `cmake --preset dev && cmake --build --preset dev && ctest --preset dev` |
+| Build and run the plugin | `./run.sh` (or `./build/dev/amber` after a build) |
+| Run benchmarks (optimized) | `cmake --preset release && cmake --build --preset release && ./build/release/libs/dsp/dsp_benchmarks` |
+| Coverage report | `cmake --preset coverage && cmake --build --preset coverage --target coverage` |
+| Format code | `cmake --build --preset dev --target format` |
+| Build docs | `cmake --build --preset dev --target docs`, then open `build/dev/docs/html/index.html` |
+| Everything CI runs (clang-tidy, tests, format-check) | `cmake --preset ci && cmake --build --preset ci && ctest --preset ci && cmake --build --preset ci --target format-check` |
 
-or manually:
+The same commands are available as Zed tasks (`.zed/tasks.json`).
 
-```sh
-cmake -B build
-cmake --build build
-./build/amber
-```
+## Running
 
 At startup you pick an input and an output device by index. While running:
 
@@ -101,8 +116,7 @@ Audio runs at 48 kHz, stereo, 1024-frame buffers (see `main.c`).
 ## Tests
 
 ```sh
-cmake --build build
-ctest --test-dir build --output-on-failure
+ctest --preset dev
 ```
 
 Some tests live inline in headers via `inline_test.h`; they compile only with

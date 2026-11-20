@@ -1,16 +1,15 @@
 #include "dsp/amber.h"
-#include <stdio.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <portaudio.h>
-#include <stdbool.h>
 #include <dsp/error.h>
 #include <dsp/q15.h>
+#include <portaudio.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-#include <dsp/audio_component.h>
-#include <dsp/plugin_handler.h>
-#include <dsp/one_pole.h>
 #include <dsp/amber.h>
+#include <dsp/audio_component.h>
+#include <dsp/one_pole.h>
+#include <dsp/plugin_handler.h>
 
 #define SAMPLE_RATE 48000.0
 #define FRAMES_PER_BUFFER 1024
@@ -19,35 +18,28 @@
 int isEffectOn = 1;
 bool keepRunning = true;
 
-int audioProcessFunction(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void *userData)
-{
+int audioProcessFunction(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer,
+                         const PaStreamCallbackTimeInfo *timeInfo,
+                         PaStreamCallbackFlags statusFlags, void *userData) {
     float *out = (float *)outputBuffer;
     const float *in = (const float *)inputBuffer;
     (void)timeInfo;
     (void)statusFlags;
     (void)userData;
 
-    if (inputBuffer == NULL)
-    {
-        for (size_t i = 0; i < framesPerBuffer; i++)
-        {
+    if (inputBuffer == NULL) {
+        for (size_t i = 0; i < framesPerBuffer; i++) {
             *out++ = 0.0f; /* left channel */
             *out++ = 0.0f; /* right channel */
         }
-    }
-    else
-    {
+    } else {
         /* If the input exists -> */
-        if (!isEffectOn)
-        {
-            for (size_t i = 0; i < framesPerBuffer; i++)
-            {
+        if (!isEffectOn) {
+            for (size_t i = 0; i < framesPerBuffer; i++) {
                 *out++ = *in++; /* left channel */
                 *out++ = *in++; /* right channel */
             }
-        }
-        else
-        {
+        } else {
             // gainerPlugin.process(inputBuffer, outputBuffer, framesPerBuffer);
             process_plugin_chain(inputBuffer, outputBuffer, framesPerBuffer, NUM_CHANNELS);
         }
@@ -56,10 +48,8 @@ int audioProcessFunction(const void *inputBuffer, void *outputBuffer, unsigned l
     return keepRunning ? paContinue : paComplete;
 }
 
-int main(/* int argc, const char *argv[]*/)
-{
+int main(/* int argc, const char *argv[]*/) {
     printf("Hello, from C_Plugins!\n");
-
 
     // registerPluginToChain(&gain);
     // Plugin *op = one_pole_create(48000.0, 2, 0.9f);
@@ -81,8 +71,7 @@ int main(/* int argc, const char *argv[]*/)
 
     /* Get default devices and infos thereof */
     int numDevices = Pa_GetDeviceCount();
-    if (numDevices < 0)
-    {
+    if (numDevices < 0) {
         printf("Error getting device count: %s\n", Pa_GetErrorText(numDevices));
         Pa_Terminate();
 
@@ -97,8 +86,7 @@ int main(/* int argc, const char *argv[]*/)
     /* Number of audio devices */
     int ndev = Pa_GetDeviceCount();
     printf("\nInput Devices: \n");
-    for (uint16_t i = 0; i < ndev; i++)
-    {
+    for (uint16_t i = 0; i < ndev; i++) {
         const PaDeviceInfo *inputInfo = Pa_GetDeviceInfo((PaDeviceIndex)i);
 
         if (inputInfo->maxInputChannels > 0)
@@ -108,11 +96,11 @@ int main(/* int argc, const char *argv[]*/)
     int selectedInputDeviceIndex;
     printf("\nSelect Input Device: \n");
     scanf("%d", &selectedInputDeviceIndex);
-    printf("\nYour selected input device: %s. \n", Pa_GetDeviceInfo((PaDeviceIndex)selectedInputDeviceIndex)->name);
+    printf("\nYour selected input device: %s. \n",
+           Pa_GetDeviceInfo((PaDeviceIndex)selectedInputDeviceIndex)->name);
 
     printf("\nOutput Devices: \n");
-    for (uint16_t i = 0; i < ndev; i++)
-    {
+    for (uint16_t i = 0; i < ndev; i++) {
         const PaDeviceInfo *outputInfo = Pa_GetDeviceInfo((PaDeviceIndex)i);
         if (outputInfo->maxOutputChannels > 0)
             printf("%d: %s\n", i, outputInfo->name);
@@ -121,11 +109,11 @@ int main(/* int argc, const char *argv[]*/)
     int selectedOutputDeviceIndex;
     printf("\nSelect output Device: \n");
     scanf("%d", &selectedOutputDeviceIndex);
-    printf("\nYour selected output device: %s. \n", Pa_GetDeviceInfo((PaDeviceIndex)selectedOutputDeviceIndex)->name);
+    printf("\nYour selected output device: %s. \n",
+           Pa_GetDeviceInfo((PaDeviceIndex)selectedOutputDeviceIndex)->name);
     getchar();
 
-    if (!defaultInputDeviceInfo || !defaultOuputDeviceInfo)
-    {
+    if (!defaultInputDeviceInfo || !defaultOuputDeviceInfo) {
         printf("Error getting devie info\n");
         Pa_Terminate();
 
@@ -146,30 +134,27 @@ int main(/* int argc, const char *argv[]*/)
     outparam.device = selectedOutputDeviceIndex;
     outparam.channelCount = NUM_CHANNELS; // Stereo output
     outparam.sampleFormat = paFloat32;
-    outparam.suggestedLatency = Pa_GetDeviceInfo(selectedOutputDeviceIndex)->defaultHighOutputLatency;
+    outparam.suggestedLatency =
+        Pa_GetDeviceInfo(selectedOutputDeviceIndex)->defaultHighOutputLatency;
     outparam.hostApiSpecificStreamInfo = NULL;
 
     /* Create audio stream with selected input ad output devices*/
-    err = Pa_OpenStream(&stream,
-                        &inparam,
-                        &outparam,
-                        SAMPLE_RATE,
-                        FRAMES_PER_BUFFER,
+    err = Pa_OpenStream(&stream, &inparam, &outparam, SAMPLE_RATE, FRAMES_PER_BUFFER,
                         paClipOff, // Don't clip
-                        audioProcessFunction,
-                        NULL);
+                        audioProcessFunction, NULL);
 
     /* Print selected audio devices */
-    const PaDeviceInfo *selectedInputDeviceInfo = Pa_GetDeviceInfo((PaDeviceIndex)selectedInputDeviceIndex);
-    const PaDeviceInfo *selectedOutputDeviceInfo = Pa_GetDeviceInfo((PaDeviceIndex)selectedOutputDeviceIndex);
+    const PaDeviceInfo *selectedInputDeviceInfo =
+        Pa_GetDeviceInfo((PaDeviceIndex)selectedInputDeviceIndex);
+    const PaDeviceInfo *selectedOutputDeviceInfo =
+        Pa_GetDeviceInfo((PaDeviceIndex)selectedOutputDeviceIndex);
 
-    printf("\nDefault input device: %s (max channels: %d)\n",
-           selectedInputDeviceInfo->name, selectedInputDeviceInfo->maxInputChannels);
-    printf("Default output device: %s (max channels: %d)\n",
-           selectedOutputDeviceInfo->name, selectedOutputDeviceInfo->maxOutputChannels);
+    printf("\nDefault input device: %s (max channels: %d)\n", selectedInputDeviceInfo->name,
+           selectedInputDeviceInfo->maxInputChannels);
+    printf("Default output device: %s (max channels: %d)\n", selectedOutputDeviceInfo->name,
+           selectedOutputDeviceInfo->maxOutputChannels);
 
-    if (err != paNoError)
-    {
+    if (err != paNoError) {
         printf("PortAudio error: %s\n", Pa_GetErrorText(err));
         Pa_Terminate();
 
@@ -177,8 +162,7 @@ int main(/* int argc, const char *argv[]*/)
     }
 
     err = Pa_StartStream(stream);
-    if (err != paNoError)
-    {
+    if (err != paNoError) {
         printf("PortAudio error: %s\n", Pa_GetErrorText(err));
 
         /* Now, we also need to close the audio stream before terminating the application */
@@ -193,27 +177,19 @@ int main(/* int argc, const char *argv[]*/)
     printf("Press 2 to turn off the effect (currently %s)\n", isEffectOn ? "ON" : "OFF");
     printf("Press 4 to stop streaming and exit\n");
 
-    while (keepRunning)
-    {
+    while (keepRunning) {
         int key = getchar();
 
-        if (key == 49)
-        {
+        if (key == 49) {
             isEffectOn = true;
             printf("Effect is %s\n", isEffectOn ? "ON" : "OFF");
-        }
-        else if (key == 50)
-        {
+        } else if (key == 50) {
             isEffectOn = false;
             printf("Effect is %s\n", isEffectOn ? "ON" : "OFF");
-        }
-        else if (key == 52)
-        {
+        } else if (key == 52) {
             printf("Stopping the audio stream...\n");
             keepRunning = false;
-        }
-        else
-        {
+        } else {
             if (key != 10)
                 printf("Invalid Input... Try again.\n");
         }
@@ -223,14 +199,12 @@ int main(/* int argc, const char *argv[]*/)
 
     /* Stop and close the stream */
     err = Pa_StopStream(stream);
-    if (err != paNoError)
-    {
+    if (err != paNoError) {
         printf("PortAudio error: %s\n", Pa_GetErrorText(err));
     }
 
     err = Pa_CloseStream(stream);
-    if (err != paNoError)
-    {
+    if (err != paNoError) {
         printf("PortAudio error: %s\n", Pa_GetErrorText(err));
     }
 
