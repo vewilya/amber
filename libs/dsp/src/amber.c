@@ -3,7 +3,6 @@
 #include <string.h>
 #include <torchline/torchline.h>
 
-
 #define AMBER_MAX_CHANNELS 2
 
 typedef struct {
@@ -19,17 +18,19 @@ typedef struct {
 
 // linear interolation for the lookup table values
 static float makeup_for(float drive) {
-    float pos = (drive - MAKEUP_DRIVE_MIN) / (MAKEUP_DRIVE_MAX - MAKEUP_DRIVE_MIN) * (MAKEUP_TABLE_SIZE - 1);
-    if (pos <= 0.0f) return makeup_table[0];
-    if (pos >= MAKEUP_TABLE_SIZE - 1) return makeup_table[MAKEUP_TABLE_SIZE - 1];
+    float pos = (drive - MAKEUP_DRIVE_MIN) / (MAKEUP_DRIVE_MAX - MAKEUP_DRIVE_MIN) *
+                (MAKEUP_TABLE_SIZE - 1);
+    if (pos <= 0.0f)
+        return makeup_table[0];
+    if (pos >= MAKEUP_TABLE_SIZE - 1)
+        return makeup_table[MAKEUP_TABLE_SIZE - 1];
 
     int i = (int)pos;
     float t = pos - i;
     return makeup_table[i] + t * (makeup_table[i + 1] - makeup_table[i]);
 }
 
-
-void  amber_process(Plugin *self, float *buffer, size_t num_frames) {
+void amber_process(Plugin *self, float *buffer, size_t num_frames) {
     Amber *amber = (Amber *)self;
 
     const int num_channels = amber->num_channels;
@@ -40,37 +41,41 @@ void  amber_process(Plugin *self, float *buffer, size_t num_frames) {
         float *frame = &buffer[f * num_channels];
         float in[AMBER_MAX_CHANNELS];
 
-        for (int c = 0; c < num_channels; c++) in[c] = frame[c] * drive;
+        for (int c = 0; c < num_channels; c++)
+            in[c] = frame[c] * drive;
         tl_forward(amber->net, in, frame);
-        for (int c = 0; c < num_channels; c++) frame[c] *= makeup;
+        for (int c = 0; c < num_channels; c++)
+            frame[c] *= makeup;
     }
 }
 
 Err_t amber_set_parameter(Plugin *self, const char *name, float value) {
     Amber *amber = (Amber *)self;
-    if (strcmp(name, "drive") != 0) return PARAM_ERR;
-    if (value < 0.0f || value > 3.0f) return VALUE_ERR;
+    if (strcmp(name, "drive") != 0)
+        return PARAM_ERR;
+    if (value < 0.0f || value > 3.0f)
+        return VALUE_ERR;
 
     amber->drive = value;
     amber->makeup_gain = makeup_for(value);
     return NO_ERR;
 }
 
-void  amber_destroy(Plugin *self) {
-    free(self);
-}
+void amber_destroy(Plugin *self) { free(self); }
 
 Plugin *amber_create(double sample_rate, int num_channels, float drive) {
-    if (num_channels <= 0 || num_channels > AMBER_MAX_CHANNELS) return NULL;
+    if (num_channels <= 0 || num_channels > AMBER_MAX_CHANNELS)
+        return NULL;
 
-    Amber *amber =  calloc(1, sizeof(*amber));
-    if (!amber) return NULL;
+    Amber *amber = calloc(1, sizeof(*amber));
+    if (!amber)
+        return NULL;
 
     amber->base = (Plugin){
         .name = "Amber",
-        .process       = amber_process,
+        .process = amber_process,
         .set_parameter = amber_set_parameter,
-        .destroy       = amber_destroy,
+        .destroy = amber_destroy,
     };
 
     amber->sample_rate = sample_rate;
@@ -80,8 +85,7 @@ Plugin *amber_create(double sample_rate, int num_channels, float drive) {
 
     amber->net = tl_load_network();
 
-    if (tl_input_size(amber->net) != num_channels ||
-        tl_output_size(amber->net) != num_channels) {
+    if (tl_input_size(amber->net) != num_channels || tl_output_size(amber->net) != num_channels) {
         free(amber);
         return NULL;
     }

@@ -21,7 +21,8 @@ std::vector<float> make_sine_buffer(size_t num_frames) {
     return buffer;
 }
 
-// Runs one plugin over a block of the given size (state.range(0) frames), as the audio callback would.
+// Runs one plugin over a block of the given size (state.range(0) frames), as the audio callback
+// would.
 void run_plugin(benchmark::State &state, Plugin *plugin) {
     const auto num_frames = static_cast<size_t>(state.range(0));
     // Processed in place every iteration; the output stays bounded, and the per-sample cost

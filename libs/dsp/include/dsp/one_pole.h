@@ -1,6 +1,6 @@
-#include <stdio.h>
 #include <dsp/error.h>
 #include <dsp/plugin.h>
+#include <stdio.h>
 
 #ifndef ONEPOLE_H
 #define ONEPOLE_H

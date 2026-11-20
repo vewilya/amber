@@ -20,7 +20,6 @@ Err_t register_plugin_to_chain(Plugin *plugin_to_add) {
     return NO_ERR;
 }
 
-
 void process_plugin_chain(const float *input, float *output, size_t num_frames, int num_channels) {
     memcpy(output, input, num_frames * num_channels * sizeof *output);
 

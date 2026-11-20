@@ -5,25 +5,25 @@
 #include <stdlib.h>
 
 const TlNetwork *tl_load_network() {
-    static const TlNetwork network = { LAYER_COUNT, layers };
+    static const TlNetwork network = {LAYER_COUNT, layers};
     return &network;
 }
 
-int tl_input_size(const TlNetwork *net)  { return net->layers[0].num_inputs; }
+int tl_input_size(const TlNetwork *net) { return net->layers[0].num_inputs; }
 int tl_output_size(const TlNetwork *net) { return net->layers[net->num_layers - 1].num_outputs; }
 
 static float activate(Activation function, float x) {
     switch (function) {
-        case ACTIVATION_NONE:
-            return x;
-        case ACTIVATION_RELU:
-            return x > 0 ? x : 0;
-        case ACTIVATION_SIGMOID:
-            return 1.0f / (1.0f + expf(-x));
-        case ACTIVATION_TANH:
-            return tanhf(x);
-        default:
-            return x;
+    case ACTIVATION_NONE:
+        return x;
+    case ACTIVATION_RELU:
+        return x > 0 ? x : 0;
+    case ACTIVATION_SIGMOID:
+        return 1.0f / (1.0f + expf(-x));
+    case ACTIVATION_TANH:
+        return tanhf(x);
+    default:
+        return x;
     }
 }
 
@@ -66,7 +66,6 @@ int main(void) {
     float inputs[MODEL_INPUT_SIZE] = {0.5f, 0.3f};
     float outputs[MAX_LAYER_SIZE];
     tl_forward(net, inputs, outputs);
-
 
     for (int i = 0; i < MODEL_OUTPUT_SIZE; i++)
         printf("output[%d] = %f\n", i, outputs[i]);

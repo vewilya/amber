@@ -5,9 +5,9 @@
 #define COMPONENT_H
 
 typedef struct {
-  double sampleRate;
-  int numChannels;
-  float gain;
+    double sampleRate;
+    int numChannels;
+    float gain;
 
 } AudioComponent;
 
