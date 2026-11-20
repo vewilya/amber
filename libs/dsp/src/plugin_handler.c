@@ -18,7 +18,7 @@ Err_t register_plugin_to_chain(Plugin *plugin_to_add) {
     plugin_chain[plugin_count++] = plugin_to_add;
 
     return NO_ERR;
-};
+}
 
 
 void process_plugin_chain(const float *input, float *output, size_t num_frames, int num_channels) {
@@ -28,11 +28,11 @@ void process_plugin_chain(const float *input, float *output, size_t num_frames, 
         Plugin *p = plugin_chain[i];
         p->process(p, output, num_frames);
     }
-};
+}
 
 void shutdown_all_plugins(void) {
     for (size_t i = 0; i < plugin_count; i++) {
         Plugin *p = plugin_chain[i];
         p->destroy(p);
     }
-};
+}

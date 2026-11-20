@@ -1,0 +1,9 @@
+# Plain C project: modernize-* is C++ advice (e.g. it would strip the `(void)` C needs).
+Checks: >
+  bugprone-*,
+  performance-*,
+  readability-*,
+  -readability-identifier-length,
+  -readability-magic-numbers,
+  -readability-uppercase-literal-suffix
+HeaderFilterRegex: 'libs/.*/include/.*'

@@ -1,7 +1,7 @@
 #!/bin/bash
+set -euo pipefail
 
-cmake -B build
-cmake --build build
-
-cd build/
-./amber
+cd "$(dirname "$0")"
+cmake --preset dev
+cmake --build --preset dev
+./build/dev/amber

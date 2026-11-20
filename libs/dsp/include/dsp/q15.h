@@ -33,11 +33,11 @@ static inline q15_t q15_from_float(float x) {
     if (x >=  1.0f) return Q15_MAX;
     if (x <= -1.0f) return Q15_MIN;
     return (q15_t)(x * Q15_SCALE);
-};
+}
 
 static inline float float_from_q15(q15_t x) {
     return (float)x * (1.0f / Q15_SCALE);
-};
+}
 
 #endif
 
