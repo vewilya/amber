@@ -4,9 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void init() {
-    printf("Init");
-}
+void init() { printf("Init"); }
 
 Vector *vec_create(float *data, size_t size) {
     Vector *vec = malloc(sizeof(Vector));
@@ -22,7 +20,7 @@ Matrix *mat_create(size_t rows, size_t cols) {
         return NULL;
     }
 
-    mat->data = calloc(rows * cols, sizeof(float));   // zeroed
+    mat->data = calloc(rows * cols, sizeof(float)); // zeroed
     if (mat->data == NULL) {
         free(mat);
         return NULL;
@@ -36,7 +34,7 @@ Matrix *mat_create(size_t rows, size_t cols) {
 Matrix *mat_create_from(const float *data, size_t rows, size_t cols) {
     Matrix *mat = mat_create(rows, cols);
     if (mat != NULL) {
-        memcpy(mat->data, data, rows * cols * sizeof(float));   // <string.h>
+        memcpy(mat->data, data, rows * cols * sizeof(float)); // <string.h>
     }
     return mat;
 }
@@ -47,7 +45,6 @@ void mat_free(Matrix *mat) {
         free(mat);
     }
 }
-
 
 float scalar_product(Vector *a, Vector *b) {
     if (a->size != b->size) {
