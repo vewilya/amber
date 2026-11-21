@@ -55,7 +55,7 @@ A small MLP is trained in PyTorch to mimic an **asymmetric soft-saturation curve
     │   │   └── inline_test.h     # TEST() macros for tests living next to code
     │   ├── src/
     │   ├── tests/
-    │   └── benchmarks/     # Google Benchmark (C++)
+    │   └── benchmarks/     # timing harness in libs/bench
     └── torchline/          # minimal feed-forward inference engine in C
         ├── include/torchline/torchline.h
         ├── src/
@@ -74,13 +74,12 @@ A small MLP is trained in PyTorch to mimic an **asymmetric soft-saturation curve
 - CMake ≥ 3.25
 - [PortAudio](https://www.portaudio.com/) (found via `pkg-config` as `portaudio-2.0`)
 - [Criterion](https://github.com/Snaipe/Criterion) for unit tests
-- [Google Benchmark](https://github.com/google/benchmark) (C++) for benchmarks
 - clang-format, clang-tidy (from `llvm`) and Doxygen for the developer targets
 - [uv](https://docs.astral.sh/uv/) and Python ≥ 3.15 for training (optional)
 
 ```sh
 # macOS
-brew install cmake pkg-config portaudio criterion google-benchmark llvm clang-format doxygen uv
+brew install cmake pkg-config portaudio criterion llvm clang-format doxygen uv
 # Ubuntu: see .github/workflows/ci.yml
 
 # Optional, for clangd: point it at the dev build's compile database
