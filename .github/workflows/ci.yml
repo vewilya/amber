@@ -11,7 +11,6 @@ jobs:
     runs-on: ubuntu-26.04
     env:
       CC: clang
-      CXX: clang++
       # Major version of clang-format; keep in sync with the local dev machine.
       # renovate: datasource=github-releases depName=llvm/llvm-project
       LLVM_VERSION: "23"
@@ -21,8 +20,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
-            cmake clang clang-tidy pkg-config portaudio19-dev libcriterion-dev \
-            libbenchmark-dev doxygen
+            cmake clang clang-tidy pkg-config portaudio19-dev libcriterion-dev doxygen
           # Ubuntu's clang-format lags behind; pull the pinned one from LLVM's official apt repo.
           wget -qO llvm.sh https://apt.llvm.org/llvm.sh
           sudo bash llvm.sh "$LLVM_VERSION"

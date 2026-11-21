@@ -10,6 +10,11 @@
     "cwd": "$ZED_WORKTREE_ROOT"
   },
   {
+    "label": "dev: test current library",
+    "command": "lib=$(echo \"$ZED_RELATIVE_FILE\" | cut -d/ -f2) && cmake --preset dev && cmake --build --preset dev --target ${lib}_tests && ./build/dev/libs/$lib/${lib}_tests --verbose",
+    "cwd": "$ZED_WORKTREE_ROOT"
+  },
+  {
     "label": "dev: run plugin",
     "command": "cmake --preset dev && cmake --build --preset dev && ./build/dev/amber",
     "cwd": "$ZED_WORKTREE_ROOT"
@@ -46,15 +51,23 @@
   },
   {
     "label": "Test current file",
-    "command": "mkdir -p \"$ZED_WORKTREE_ROOT/build\" && clang -DRUN_TESTS -Wall -Wextra -Wno-unused-function -g -fsanitize=address,undefined -x c \"$ZED_FILE\" -I\"$ZED_DIRNAME\" -I\"$ZED_WORKTREE_ROOT/libs/dsp/include\" -I$(brew --prefix)/include -L$(brew --prefix)/lib -lcriterion -o \"$ZED_WORKTREE_ROOT/build/${ZED_STEM}_test\" && \"$ZED_WORKTREE_ROOT/build/${ZED_STEM}_test\" --verbose"
+    "command": "mkdir -p \"$ZED_WORKTREE_ROOT/build\" && clang -DRUN_TESTS -Wall -Wextra -Wno-unused-function -g -fsanitize=address,undefined -x c \"$ZED_FILE\" -I\"$ZED_DIRNAME\" $(printf -- '-I%s ' \"$ZED_WORKTREE_ROOT\"/libs/*/include) -I$(brew --prefix)/include -L$(brew --prefix)/lib -lcriterion -o \"$ZED_WORKTREE_ROOT/build/${ZED_STEM}_test\" && \"$ZED_WORKTREE_ROOT/build/${ZED_STEM}_test\" --verbose"
   },
   {
     "label": "Run main in current file",
-    "command": "mkdir -p \"$ZED_WORKTREE_ROOT/build\" && clang -DRUN_MAIN -std=c23 -Wall -Wextra -Wno-unused-function -g -fsanitize=address,undefined -x c \"$ZED_FILE\" -I\"$ZED_DIRNAME\" -I\"$ZED_WORKTREE_ROOT/libs/dsp/include\" -I\"$ZED_WORKTREE_ROOT/libs/torchline/include\" -lm -o \"$ZED_WORKTREE_ROOT/build/${ZED_STEM}_main\" && \"$ZED_WORKTREE_ROOT/build/${ZED_STEM}_main\""
+    "command": "mkdir -p \"$ZED_WORKTREE_ROOT/build\" && clang -DRUN_MAIN -std=c23 -Wall -Wextra -Wno-unused-function -g -fsanitize=address,undefined -x c \"$ZED_FILE\" -I\"$ZED_DIRNAME\" $(printf -- '-I%s ' \"$ZED_WORKTREE_ROOT\"/libs/*/include) -lm -o \"$ZED_WORKTREE_ROOT/build/${ZED_STEM}_main\" && \"$ZED_WORKTREE_ROOT/build/${ZED_STEM}_main\""
   },
   {
     "label": "Show assembly",
-    "command": "mkdir -p \"$ZED_WORKTREE_ROOT/build\" && clang -S -O2 -fno-asynchronous-unwind-tables -x c \"$ZED_FILE\" -I\"$ZED_WORKTREE_ROOT/libs/dsp/include\" -I$(brew --prefix)/include -o \"$ZED_WORKTREE_ROOT/build/$ZED_STEM.s\" && zed \"$ZED_WORKTREE_ROOT/build/$ZED_STEM.s\""
+    "command": "clang -S -O2 -std=c23 -fno-asynchronous-unwind-tables -x c \"$ZED_FILE\" -I\"$ZED_DIRNAME\" $(printf -- '-I%s ' \"$ZED_WORKTREE_ROOT\"/libs/*/include) -I$(brew --prefix)/include -o -"
+  },
+  {
+    "label": "Open assembly",
+    "command": "mkdir -p \"$ZED_WORKTREE_ROOT/build\" && clang -S -O2 -std=c23 -fno-asynchronous-unwind-tables -x c \"$ZED_FILE\" -I\"$ZED_DIRNAME\" $(printf -- '-I%s ' \"$ZED_WORKTREE_ROOT\"/libs/*/include) -I$(brew --prefix)/include -o \"$ZED_WORKTREE_ROOT/build/$ZED_STEM.s\" && zed --existing \"$ZED_WORKTREE_ROOT/build/$ZED_STEM.s\""
+  },
+  {
+    "label": "Show vectorization remarks",
+    "command": "clang -O2 -std=c23 -c -o /dev/null -x c \"$ZED_FILE\" -I\"$ZED_DIRNAME\" $(printf -- '-I%s ' \"$ZED_WORKTREE_ROOT\"/libs/*/include) -I$(brew --prefix)/include -Rpass=loop-vectorize -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize"
   },
   {
     "label": "Torchline: Train",
