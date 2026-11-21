@@ -20,6 +20,6 @@ if(BUILD_TESTS)
 endif()
 
 if(BUILD_BENCHMARKS)
-  add_executable(dsp_benchmarks benchmarks/dsp_benchmark.cpp)
-  target_link_libraries(dsp_benchmarks PRIVATE dsp benchmark::benchmark_main)
+  add_executable(dsp_benchmarks benchmarks/dsp_benchmark.c)
+  target_link_libraries(dsp_benchmarks PRIVATE dsp bench)
 endif()

@@ -18,6 +18,6 @@ if(BUILD_TESTS)
 endif()
 
 if(BUILD_BENCHMARKS)
-  add_executable(torchline_benchmarks benchmarks/torchline_benchmark.cpp)
-  target_link_libraries(torchline_benchmarks PRIVATE torchline benchmark::benchmark_main)
+  add_executable(torchline_benchmarks benchmarks/torchline_benchmark.c)
+  target_link_libraries(torchline_benchmarks PRIVATE torchline bench)
 endif()
